@@ -72,7 +72,7 @@
   with_items: "{{ nginx_reverse_proxy_proxies }}"
   notify: 'restart-docker-nginx'
 ###########################################################################################################
-- name: Start the nginx docker container ==> 더미 인증서를 적용한 Nginx 컨테이너 시작
+- name: Start the nginx docker container
   docker_container:
     image: "nginx:{{ nginx_docker_tag }}"
     networks:
