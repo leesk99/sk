@@ -1,0 +1,44 @@
+---
+# nginx_reverse_proxy_proxies:
+# - config_name: thinkerbell
+#   backend_name: thinkerbell
+#   backends:
+#     - 10.3.2.4:3000
+#   domains:
+#     - stage-socket.tkbell.co.kr
+#   locations: ''
+#   root_redirect_location: ''
+
+nginx_reverse_proxy_proxies:
+- config_name: good1
+  backend_name: good1.xcms.kr
+  backends:
+    - 10.1.11.9:5000
+    # - 10.1.0.5:19083 max_fails=3 fail_timeout=5s
+    # - 10.1.0.4:19083 backup
+  domains:
+    - good.xcms.kr
+  locations: ''
+  root_redirect_location: ''
+
+- config_name: good2
+  backend_name: good2.xcms.kr
+  backends:
+    - 10.1.11.9:5000
+    # - 10.1.0.5:19083 max_fails=3 fail_timeout=5s
+    # - 10.1.0.4:19083 backup
+  domains:
+    - good2.xcms.kr
+  locations: ''
+  root_redirect_location: ''
+
+- config_name: good3
+  backend_name: good3.xcms.kr
+  backends:
+    - 10.1.11.9:5000
+    # - 10.1.0.5:19083 max_fails=3 fail_timeout=5s
+    # - 10.1.0.4:19083 backup
+  domains:
+    - good3.xcms.kr
+  locations: ''
+  root_redirect_location: ''
