@@ -75,8 +75,8 @@
 - name: Start the nginx docker container
   docker_container:
     image: "nginx:{{ nginx_docker_tag }}"
-    networks:
-      - name: "{{ docker_network_name }}"
+    # networks:
+    #   - name: "{{ docker_network_name }}"
     name: "{{ nginx_container_name }}"
     volumes: '{{ nginx_exposed_volumes }}'
     ports: '{{ nginx_published_ports }}'
