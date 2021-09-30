@@ -5,9 +5,11 @@
 - include_tasks: RedHat.yml
   when: ansible_os_family == 'RedHat' and ansible_distribution != 'Fedora'
 
-# - name: Create a docker network
-#   docker_network:
-#     name: "{{ docker_network_name }}"
+- name: Create a docker network
+  docker_network:
+    name: "{{ docker_network_name }}"
+  vars:
+    ansible_python_interpreter: /usr/bin/python3
 
 - name: "Create the {{ nginx_base_directory }} directory on the host"
   file:
@@ -75,8 +77,8 @@
 - name: Start the nginx docker container
   docker_container:
     image: "nginx:{{ nginx_docker_tag }}"
-    # networks:
-    #   - name: "{{ docker_network_name }}"
+    networks:
+      - name: "{{ docker_network_name }}"
     name: "{{ nginx_container_name }}"
     volumes: '{{ nginx_exposed_volumes }}'
     ports: '{{ nginx_published_ports }}'
