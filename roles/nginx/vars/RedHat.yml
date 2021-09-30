@@ -10,35 +10,35 @@
 #   root_redirect_location: ''
 
 nginx_reverse_proxy_proxies:
-- config_name: god1
-  backend_name: god1.xcms.kr
+- config_name: oauth2client
+  backend_name: oauth2client
   backends:
-    - 10.1.11.9:5000
+    - 10.1.0.4:19083
     # - 10.1.0.5:19083 max_fails=3 fail_timeout=5s
     # - 10.1.0.4:19083 backup
   domains:
-    - god1.xcms.kr
+    - oauth2client.hiclass.net
   locations: ''
   root_redirect_location: ''
 
-- config_name: god2
-  backend_name: god2.xcms.kr
-  backends:
-    - 10.1.11.9:5000
-    # - 10.1.0.5:19083 max_fails=3 fail_timeout=5s
-    # - 10.1.0.4:19083 backup
-  domains:
-    - god2.xcms.kr
-  locations: ''
-  root_redirect_location: ''
+# - config_name: god2
+#   backend_name: god2.xcms.kr
+#   backends:
+#     - 10.1.11.9:5000
+#     # - 10.1.0.5:19083 max_fails=3 fail_timeout=5s
+#     # - 10.1.0.4:19083 backup
+#   domains:
+#     - god2.xcms.kr
+#   locations: ''
+#   root_redirect_location: ''
 
-- config_name: god3
-  backend_name: god3.xcms.kr
-  backends:
-    - 10.1.11.9:5000
-    # - 10.1.0.5:19083 max_fails=3 fail_timeout=5s
-    # - 10.1.0.4:19083 backup
-  domains:
-    - god3.xcms.kr
-  locations: ''
-  root_redirect_location: ''
+# - config_name: god3
+#   backend_name: god3.xcms.kr
+#   backends:
+#     - 10.1.11.9:5000
+#     # - 10.1.0.5:19083 max_fails=3 fail_timeout=5s
+#     # - 10.1.0.4:19083 backup
+#   domains:
+#     - god3.xcms.kr
+#   locations: ''
+#   root_redirect_location: ''
