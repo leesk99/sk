@@ -36,38 +36,3 @@ nginx_reverse_proxy_proxies:
     balancer_config: least_conn; # Important to add semicolon at the end ; if not the config will break
 
 ```
-
-License
--------
-
-[MIT](LICENSE.txt)
-
-Author Information
-------------------
-
-* Marvin Pinto
-
-Collaborators
--------------
-
-* Pablo Estigarribia (pablodav at gmail)
-
-More documentation
-------------------
-
-https://www.nginx.com/resources/wiki/start/topics/tutorials/config_pitfalls/#taxing-rewrites
-
-http://nginx.org/en/docs/http/ngx_http_upstream_module.html
-
-Notes about nginx settings
---------------------------
-
-When adding backends, if you prefer to add them using DNS ensure server can resolve the DNS name before starting nginx.
-If nginx doesn't resolve the DNS name, it will not start.
-
-
-Developers
-----------
-
-Help in autotest this role:
-https://github.com/CoffeeITWorks/ansible-generic-help/blob/master/Developers.md
