@@ -52,15 +52,15 @@
     src: default.conf
     dest: "{{ nginx_reverse_proxy_config_directory }}"
 # #########################################################################################################
-- name: deploy SSL/TLS cert.pem
-  template:
-    src: cert.pem
-    dest: "{{ nginx_ssl_certificate_path }}"
+# - name: deploy SSL/TLS cert.pem
+#   template:
+#     src: cert.pem
+#     dest: "{{ nginx_ssl_certificate_path }}"
 
-- name: deploy SSL/TLS key.pem
-  template:
-    src: key.pem
-    dest: "{{ nginx_ssl_certificate_key_path }}"
+# - name: deploy SSL/TLS key.pem
+#   template:
+#     src: key.pem
+#     dest: "{{ nginx_ssl_certificate_key_path }}"
 #############################################################################################################
 - name: deploy server.rewrite
   template:

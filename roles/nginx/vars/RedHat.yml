@@ -21,7 +21,6 @@ nginx_reverse_proxy_proxies:
   locations: ''
   root_redirect_location: ''
 
-nginx_reverse_proxy_proxies:
 - config_name: stage-netty-socket
   backend_name: stage-netty-socket
   backends:
