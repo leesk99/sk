@@ -10,17 +10,28 @@
 #   root_redirect_location: ''
 
 nginx_reverse_proxy_proxies:
-- config_name: oauth2client
-  backend_name: oauth2client
+- config_name: stage-netty-web
+  backend_name: stage-netty-web
   backends:
-    - 10.1.0.4:19083
+    - 10.3.2.4:10101
     # - 10.1.0.5:19083 max_fails=3 fail_timeout=5s
     # - 10.1.0.4:19083 backup
   domains:
-    - oauth2client.hiclass.net
+    - stage-netty-web.tkbell.co.kr
   locations: ''
   root_redirect_location: ''
 
+nginx_reverse_proxy_proxies:
+- config_name: stage-netty-socket
+  backend_name: stage-netty-socket
+  backends:
+    - 10.3.2.4:10103
+    # - 10.1.0.5:19083 max_fails=3 fail_timeout=5s
+    # - 10.1.0.4:19083 backup
+  domains:
+    - stage-netty-socket.tkbell.co.kr
+  locations: ''
+  root_redirect_location: ''
 # - config_name: god2
 #   backend_name: god2.xcms.kr
 #   backends:
