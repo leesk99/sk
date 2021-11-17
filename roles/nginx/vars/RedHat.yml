@@ -1,23 +1,23 @@
 ---
 nginx_reverse_proxy_proxies:
-- config_name: stage-netty-web
-  backend_name: stage-netty-web
+- config_name: netty-web
+  backend_name: netty-web
   backends:
-    - 10.3.2.4:10101
+    - 10.3.1.4:10101
     # - 10.1.0.5:19083 max_fails=3 fail_timeout=5s
     # - 10.1.0.4:19083 backup
   domains:
-    - stage-netty-web.tkbell.co.kr
+    - netty-web.tkbell.co.kr
   locations: ''
   root_redirect_location: ''
 
-- config_name: stage-netty-socket
-  backend_name: stage-netty-socket
+- config_name: netty-socket
+  backend_name: netty-socket
   backends:
-    - 10.3.2.4:10103
+    - 10.3.1.4:10103
     # - 10.1.0.5:19083 max_fails=3 fail_timeout=5s
     # - 10.1.0.4:19083 backup
   domains:
-    - stage-netty-socket.tkbell.co.kr
+    - netty-socket.tkbell.co.kr
   locations: ''
   root_redirect_location: ''
