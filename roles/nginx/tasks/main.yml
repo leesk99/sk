@@ -9,7 +9,7 @@
   docker_network:
     name: "{{ docker_network_name }}"
   vars:
-    ansible_python_interpreter: /usr/bin/python2.7
+    ansible_python_interpreter: /usr/bin/python3
 
 - name: "Create the {{ nginx_base_directory }} directory on the host"
   file:
