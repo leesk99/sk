@@ -1,0 +1,19 @@
+apiVersion : apps/v1
+kind: Deployment
+metadata:
+  name: "kubehigh-5708"
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: "kubehigh-5708"
+  template:
+    metadata:
+      labels:
+        app: "kubehigh-5708"
+    spec:
+      containers:
+        - name: "kubehigh-5708"
+          image: "highvimcr.azurecr.io/kubehigh"
+          ports:
+          - containerPort: 8080
