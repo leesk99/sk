@@ -1,0 +1,48 @@
+# 이 파일은 yaml vm 배포 후 추가적으로 환경 세팅을 해줍니다. made by youngjin 
+# 제작 목적 : VM 생성 후 초기 환경 셋팅을 위한 파일 
+# 적용 범위
+# 0. 필요한 패키지 설치 진행
+# 1.  SSH Port 22 -> 16215
+# 2.  /etc/motd 접근 로그인 창 변경
+# 3. /etc/sysctl.conf 리눅스 커널 변경
+# 4. 
+---
+- hosts: "{{ hosts }}" ## AWX 내에 EXTRA var 에서 hosts : [호스트명을 입력해주세요]
+  gather_facts: no ## 정보 팩트 체크 no로 설정시 좀더 빠르게 돌릴 수 있음
+  become: yes  ## 루트 권한으로 전환 시켜준다 
+  tasks: 
+  - name : "yum install install yum-plugin-priorities epel-release java-1.8.0-openjdk java-1.8.0-openjdk-devel git python3 python3-devel python3-pip;
+                    sudo yum groupinstall -y \"Development Tools\" "
+    yum : 
+      name : yum-plugin-priorities
+        - epel-release
+        - java-1.8.0-openjdk
+        - java-1.8.0-openjdk-devel
+        - git
+        - python3
+        - python3-devel
+        - python3-pip;
+      state : present
+
+  - name : "install docker --> external repository 에서 땡겨온다."
+    command:
+  # SSH port 변경 부분 
+  - name : "ssh port 22 => 16215"
+    command: "sudo sed -i 's/^#Port 22$/Port 16215/' /etc/ssh/sshd_config"
+  
+  - name: "motd issue.net"  
+    command: "sudo sed -i 's/^#Banner none$/Banner /etc/issue.net/' /etc/ssh/sshd_config"
+  
+
+
+  # 초기 패스워드 지정
+  - name: "루트 패스워드 a3308ALELDJ"
+    user:
+      name: root
+      password: "{{ 'a3308ALELDJ!@#$' | password_hash('sha512') }}"
+      state: present
+    ansible_python_interpreter: /usr/bin/python3
+  - name:
+
+    
+    

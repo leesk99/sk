@@ -1,0 +1,370 @@
+# 이 파일은 yaml vm 배포 후 추가적으로 환경 세팅을 해줍니다. made by youngjin 
+# 제작 목적 : VM 생성 후 초기 환경 셋팅을 위한 파일 
+# 적용 범위
+# 0. 필요한 패키지 설치 진행 [완료]
+# 1.  SSH Port 22 -> 16215 [진행중]
+# 2.  /etc/motd 접근 로그인 창 변경 [완료]
+# 3. /etc/sysctl.conf 리눅스 커널 변경 [완료]
+# 4. /etc/selinux/config  selinux 꺼주기 [완료]
+# 5. enforce 부분 Permissive로 변경 [완료]
+# 6. timezone 을 Asia/Seoul로 변경 해주기 [완료]
+# 7. root 비밀번호를 a3308ALELDJ!@#$ 로 변경해주기 [진행중]
+# 8. docker 설치 및 활성화 , 유저 권한 변경 [완료]
+# 9. node_exporter 설치 및 python3 pip 설치 [완료]
+# 10. bash 로그인 프로파일 부분 수정 [완료]
+# 11. /etc/security/limits 부분 수정 [완료]
+# 12. 배너 조정 [완료]
+# 13. password 변경 [완료]
+# 14. ssh port 변경 [완료]
+# 향후 더 필요한 정보들은 아래에 계속 기입 해주세요.
+#
+#####################################################################################
+- hosts: "{{ hosts }}" ## AWX 내에 EXTRA var 에서 hosts : [호스트명을 입력해주세요]
+  gather_facts: no ## 정보 팩트 체크 no로 설정시 좀더 빠르게 돌릴 수 있음
+  become: yes  ## 루트 권한으로 전환 시켜준다 
+  tasks: 
+  - name : "yum install install yum-plugin-priorities epel-release java-1.8.0-openjdk java-1.8.0-openjdk-devel git python3 python3-devel python3-pip;
+            sudo yum groupinstall -y \"Development Tools\" "
+    yum : 
+      name :
+        - yum-plugin-priorities
+        - epel-release
+        - java-1.8.0-openjdk
+        - java-1.8.0-openjdk-devel
+        - git
+        - python3
+        - python3-devel
+        - python3-pip
+        - "@Development Tools"
+      state : present
+  - name : "/etc/sysctl.conf 변경 구간"
+    blockinfile: 
+      path: /etc/sysctl.conf
+      block: >
+        vm.swappiness=0 
+
+        net.ipv4.ip_forward=1 
+
+        fs.file-max=10000000 
+
+        net.core.somaxconn=65535
+
+        net.core.netdev_max_backlog=16777216
+
+        net.core.rmem_max=134217728
+
+        net.core.wmem_max=67108864
+
+        net.core.rmem_default=67108864
+
+        net.core.wmem_default=67108864
+
+        net.core.optmem_max=67108864
+
+        net.ipv4.ip_local_port_range=1024 65535
+
+        net.ipv4.tcp_tw_reuse=1
+
+        net.ipv4.tcp_max_syn_backlog=16777216
+
+        net.ipv4.tcp_syncookies=1
+
+        net.ipv4.tcp_mem=134217728 134217728 134217728
+
+        net.ipv4.tcp_rmem=10240 87380 134217728
+
+        net.ipv4.tcp_wmem=10240 87380 134217728
+        
+        net.ipv4.tcp_fin_timeout=10
+
+        net.ipv4.tcp_max_orphans=262144
+
+        net.ipv4.tcp_synack_retries=5
+
+        net.ipv4.tcp_syn_retries=5
+
+        net.ipv4.tcp_keepalive_time=60
+
+        net.ipv4.tcp_keepalive_probes=3
+
+        net.ipv4.tcp_keepalive_intvl=10
+
+        net.ipv4.tcp_sack=1
+
+        net.ipv4.tcp_timestamps=1
+
+        net.ipv4.tcp_window_scaling=1
+
+        net.ipv4.tcp_slow_start_after_idle=0
+
+        net.ipv4.udp_rmem_min=65536
+
+        net.ipv4.udp_wmem_min=65536
+
+        net.unix.max_dgram_qlen=100
+
+        vm.dirty_ratio=40
+
+        vm.dirty_background_ratio=10
+
+        vm.max_map_count=262144
+
+        net.ipv4.tcp_fack=1
+
+        kernel.msgmnb=65536
+
+        kernel.msgmax=65536
+
+        vm.overcommit_memory=1
+
+#      insertAfter: EOF
+      state: present
+  
+  # sysctl.conf 적용부분
+  - name:
+    command: "sudo /sbin/sysctl -p /etc/sysctl.conf"
+
+  # Time zone Seoul로 변경
+  - name: "timezone 설정 구간"
+    command: "sudo ln -sf /usr/share/zoneinfo/Asia/Seoul /etc/localtime"
+
+  - name: "timezone 서울로 설정"
+    command: "timedatectl set-timezone Asia/Seoul"
+
+# selinux disable
+  - name: "selinux config 변경 "
+    command: "sudo sed -i 's/^SELINUX=enforcing$/SELINUX=disable/' /etc/selinux/config"
+  - name: "selinux 끄기"
+    command: "sudo setenforce 0"
+
+    # 도커 설치 부분 
+  - name : "install docker --> external repository 에서 땡겨온다."
+    get_url: 
+      url: "https://get.docker.com"
+      dest: /home/azureuser/docker_install.sh
+      mode: '0660'
+# docker 설치 sh 실행       
+  - name: "docker 설치 sh"
+    command: "sudo sh /home/azureuser/docker_install.sh"
+
+  - name : "docker systemctl start"
+    systemd:
+      state: started
+      name: docker
+  
+  - name : "docker systemctl enable"
+    systemd:
+      enabled: "yes"
+      name: docker
+
+  - name: "docker userMod"
+    command: "usermod -aG docker azureuser"  
+
+  #도커 컴포즈 다운로드 부분
+  - name: "docker compose download"
+    get_url:
+      url: 'https://github.com/docker/compose/releases/download/1.24.1/docker-compose-Linux-x86_64'
+#      url: "https://github.com/docker/compose/releases/download/1.24.1/docker-compose-{{ uname_s }}-{{ uname_r }}"
+      dest: /usr/local/bin/docker-compose
+      mode: '0644'
+      
+
+
+  - name: "docker-compose 권한 변경 "
+    file:
+      path: /usr/local/bin/docker-compose
+      owner: root
+      group: root
+      mode: '0755'
+
+
+
+  - name: "docker-compose 심볼릭 링크 파일 모듈로 전환"
+    file:
+      src: /usr/local/bin/docker-compose
+      dest: /usr/bin/docker-compose
+      owner: root
+      group: root
+      state: link
+
+  # python3 pip 설치 
+
+  - name: "python3 pip py download"
+    shell: "https://bootstrap.pypa.io/pip/3.6/get-pip.py | python3 "
+  - name: "python3 pip install psutill"
+    command: "sudo python3 -m pip install -U psutil "
+
+
+
+  - name : "프로메테우스 모니터링 설치 및 모니터링 수집 도구 node-exporter 설치 부분"
+    get_url:
+      url: https://github.com/prometheus/node_exporter/releases/download/v1.0.1/node_exporter-1.0.1.linux-amd64.tar.gz
+      dest: /tmp/node_exporter-1.0.1.linux-amd64.tar.gz
+  - name: "download 받은 node exporter 압축 해제"
+    unarchive:
+      src: /tmp/node_exporter-1.0.1.linux-amd64.tar.gz
+      dest: /tmp/
+      remote_src: true
+  - name: "압축 해제된 node_Exporter /usr/local/bin으로 옮기기"
+    copy:
+     src: /tmp/node_exporter-1.0.1.linux-amd64/node_exporter
+     dest: /usr/local/bin/
+     mode: u+x,g+x,o+x 
+     remote_src: true
+  
+  ## node_exporter systemctl 에 서비스 추가해줄 부분 생성
+  - name: "node_exporter.service 파일 생성"
+    file:
+      path: "/etc/systemd/system/node_exporter.service"     
+      state: touch
+      mode: '0755'
+
+  - name: "systemctl service에 node_exporter 추가 시키기"
+    blockinfile: 
+      path: /etc/systemd/system/node_exporter.service
+      block: >
+        [Unit]
+
+        Description=Node Exporter
+
+        After=network.target
+
+        [Service]
+
+        User=root
+
+        Group=root
+
+        Type=simple
+
+        ExecStart=/usr/local/bin/node_exporter
+
+        [Install]
+
+        WantedBy=multi-user.target
+      create: yes
+       
+  - name: "bash 로그인 프로파일 수정 부분 "
+    blockinfile:
+      path: /etc/profile
+      block: > 
+        export PS1=`hostname`'-$LOGNAME $PWD>'
+        
+  - name: "bashrc 적용"
+    blockinfile:
+      path: /root/.bashrc
+      block: >
+        export PS1="[\$LOGNAME@\`hostname\`:\$PWD]"
+
+  - name: "/etc/security/limit.d 변경"
+    lineinfile:
+      path: "/etc/security/limits.d/20-nproc.conf"
+      regexp: "{{item.regexp}}"
+      line: "{{item.line}}"
+    loop: 
+      - { regexp: '^\*          soft    nproc     4096', line: '#\*          soft    nproc     4096'}
+      - { regexp: '^root       soft    nproc     unlimited', line: '#root       soft    nproc     unlimited'}
+    
+
+# filedescriptor 부분
+  - name: "/etc/security/limits.conf 변경"
+    blockinfile:
+      path: "/etc/security/limits.conf"
+      block: >
+        *          soft    nproc     unlimited
+
+        *          hard    nproc     unlimited
+
+        *          soft    nofile    65536
+
+        *          hard    nofile    65536
+      state: present 
+  # - name: "/etc/security/limits.d/20-nproc 백업본 하나 냅두기"
+  #   copy:
+  #     src: /etc/security/limits.d/20-nproc.conf
+  #     dest: /etc/security/limits.d/20-nproc.conf.bak
+  #     mode: '0644' 
+  #     remote_src: true
+
+
+  - name: "/etc/security/limits.d/20-nproc 변경"
+    blockinfile:
+      path: "/etc/security/limits.d/20-nproc.conf"
+      block: >
+        *          soft    nproc     unlimited
+
+        *          hard    nproc     unlimited
+
+        root       soft    nproc     unlimited
+
+        root       hard    nproc     unlimited
+
+
+
+  - name: "swap 부분 off로 변경"
+    command: "swapoff -a"
+  - name: "fstab 에서 스왑 부분 주석 처리 해주기"
+    lineinfile:
+      path: "/etc/fstab"
+      regexp: '\/swap'
+      line: "#/swap"
+      backrefs: yes      
+
+  - name : "서버 접속 Banner 경로 변경"
+    lineinfile:
+      path: "/etc/ssh/sshd_config"
+      regexp: '\#Banner none$'
+      line: "Banner /etc/issue.net"
+      backrefs: yes
+  
+  - name : "기존 적용 되어 있던 Banner issue.net 삭제"
+    file:
+      path: "/etc/issue.net"
+      state: absent
+
+
+  - name : "Banner issue.net 새로 생성"
+    blockinfile:
+      path: /etc/issue.net
+      block: |
+        *******************************************************************************
+        *                                                                             *
+        *                                                                             *
+        *  [[[ WARNING ]]] This Machine Is ISCREAMmedia Inc's Property.               *
+        *                                                                             *
+        *  A Person Autherized By SIGONGmedia Inc Can Use This Machine.               *
+        *  Even If You Are Autherized, You Can Only Utilize To The Purpose.           *
+        *  Any Illegal Action May Results In Severe Civil And Criminal Penalties.     *
+        *                                                                             *
+        *                                                                             *
+        *  [[[ 경 고 ]]] 이 장비는 아이스크림미디어의 자산입니다.                     *
+        *  이 장비는 승인된 사용자만 접속해야합니다.                                  *
+        *  허가된 목적이 아닌 다른 목적으로 시스템을 사용해선 안 됩니다.              *
+        *  불법적인 행동에는 민형사상 법적 책임이 따릅니다.                           *
+        *                                                                             *
+        *                                                                             *
+        *******************************************************************************
+      create: yes
+      marker: ""
+
+  - name : "서버 Port 22 -> 16215 로 변경"
+    lineinfile:
+      path: "/etc/ssh/sshd_config"
+      regexp: '\#Port 22'
+      line: "Port 16215"
+      backrefs: yes
+
+# 초기 패스워드 지정
+  - name: "루트 패스워드 a3308ALELDJ"
+    user:
+      name: root
+      password: "{{ 'a3308ALELDJ!@#$' | password_hash('sha512') }}"
+  
+  - name: "systemctl restart sshd 이제 16215 로 접속 하시면 됩니다."
+    systemd:
+      name: "sshd"
+      state: restarted
+
+
+    
+    
